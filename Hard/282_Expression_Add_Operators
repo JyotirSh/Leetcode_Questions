@@ -1,0 +1,71 @@
+class Solution {
+    String num;
+    int len;
+    List<String> ans;
+    int target;
+
+    public void dfs_helper(String build, long prev_no, long total, int pos){
+        if(pos == len)
+        {
+            if(total == target)
+                ans.add(build);
+            return;
+        }
+        for(int i = pos;i<len;i++)
+        {
+            if(i>pos && num.charAt(pos) == '0')
+                break; // needed to avoid cases like 00* (leading 0's)
+            // if you dont do this lets take an example
+            // 105
+            // 1 is added, string build = 1 and then we are at 0, i.e, pos == 1
+            // if we go to i = 2 for pos and implement without this
+            // we will get 1*5 as an answer which is wrong, as curr_num will be parsed as 5!
+            // "05" will be 5!
+            long curr_num = Long.parseLong(num.substring(pos,i+1)); // get the number
+            if(pos == 0)
+            {
+                // have to add the 1st number to start the recursion.
+                String to_send = build+curr_num;
+                dfs_helper(to_send,curr_num,curr_num,i+1);
+            }
+            else
+            {
+                String to_send = build+"+"+curr_num;
+                long t = total+curr_num;
+                dfs_helper(to_send,curr_num,t,i+1);
+
+                to_send = build+"-"+curr_num;
+                t = total-curr_num;
+                dfs_helper(to_send,(-1)*curr_num,t,i+1);
+                // add and subtract are simple cases
+                to_send = build+"*"+curr_num;
+                t = total-prev_no+prev_no*curr_num;
+                dfs_helper(to_send,curr_num*prev_no,t,i+1);
+                // this is a tricky one lets say you have 1+2*3-5
+                // if you do 2*3 then effective current number is 6 (consider it as 6 and pass it on)
+                // to calculate the value now (total val) undo the effect of previous op by total-prev_no
+                // and add the new evaluated val [prev_no*curr_num]
+            }
+        }
+    }
+
+    public List<String> addOperators(String num, int target) {
+        /**
+        Inputs that are req. for rec fn:
+        a) string so far: 1+2*3
+        b) prev number: 1+2*3 ==> prev number for next call from 3 will be 3
+        c) value till that point: 1+2*3 ==> val till that point will be 7 [long]
+        d) return list which will have the final output [make this global]
+        e) postion pointer
+        f) target to compare [make this global]
+        g) length of total num string [make this global]
+        h) the num string [make this global]
+        */
+        this.ans = new ArrayList<> ();
+        this.len = num.length();
+        this.target = target;
+        this.num = num;
+        dfs_helper("",0,0,0);
+        return ans;
+    }
+}
