@@ -1,0 +1,33 @@
+class Solution {
+    public List<String> subdomainVisits(String[] cpdomains) {
+        HashMap<String,Integer> m = new HashMap<> ();
+        List<String> ans = new ArrayList<String> ();
+        for(int i = 0;i<cpdomains.length;i++)
+        {
+            String splitarr[] = cpdomains[i].split("\\s+");
+            int c = Integer.parseInt(splitarr[0]);
+            String total = "";
+            String[] splittwo = splitarr[1].split("\\.");
+            for(int j = splittwo.length-1;j>=0;j--)
+            {
+                String vl = splittwo[j];
+                total = vl+total;
+
+                if(m.containsKey(total))
+                    m.put(total,m.get(total)+c);
+                else
+                    m.put(total,c);
+                total = "."+total;
+            }
+        }
+
+        for(Map.Entry<String,Integer> e:m.entrySet())
+        {
+            int v = e.getValue();
+            String k= e.getKey();
+            String ret = v+" "+k;
+            ans.add(ret);
+        }
+        return ans;
+    }
+}
